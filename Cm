@@ -1835,11 +1835,57 @@ local function createFloatButton(name, topLabel, bottomLabel, order, callback)
 	Indicator.BackgroundColor3 = THEME.ToggleOff Indicator.BorderSizePixel = 0
 	Instance.new("UICorner", Indicator).CornerRadius = UDim.new(1, 0)
 	floatButtons[name] = {button = Btn, indicator = Indicator, state = false, topLbl = TopLbl, botLbl = BotLbl}
+
+	-- Dragging logic
+	local dragging = false
+	local dragStart = nil
+	local startPos = nil
+	local dragMoved = false
+
+	Btn.InputBegan:Connect(function(input)
+		if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+			dragging = true
+			dragMoved = false
+			dragStart = input.Position
+			startPos = Btn.Position
+		end
+	end)
+
+	UserInputService.InputChanged:Connect(function(input)
+		if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+			local delta = input.Position - dragStart
+			if delta.Magnitude > 5 then
+				dragMoved = true
+				-- Reparent to ScreenGui so it can move freely
+				if Btn.Parent ~= ScreenGui then
+					local absPos = Btn.AbsolutePosition
+					Btn.Parent = ScreenGui
+					Btn.Position = UDim2.new(0, absPos.X, 0, absPos.Y)
+					startPos = Btn.Position
+					dragStart = input.Position
+				end
+				Btn.Position = UDim2.new(
+					startPos.X.Scale, startPos.X.Offset + delta.X,
+					startPos.Y.Scale, startPos.Y.Offset + delta.Y
+				)
+			end
+		end
+	end)
+
+	UserInputService.InputEnded:Connect(function(input)
+		if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+			dragging = false
+		end
+	end)
+
 	Btn.MouseButton1Click:Connect(function()
+		if dragMoved then return end
 		callback(not floatButtons[name].state)
 	end)
+
 	return floatButtons[name]
 end
+
 
 createFloatButton("BatAimbot", "BAT", "AIMBOT", 1, function(state)
 	setBatAimbot(state)
