@@ -1854,7 +1854,7 @@ local function createFloatButton(name, topLabel, bottomLabel, order, callback)
 	UserInputService.InputChanged:Connect(function(input)
 		if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
 			local delta = input.Position - dragStart
-			if delta.Magnitude > 75 then
+			if delta.Magnitude > 12 then
 				dragMoved = true
 				-- Reparent to ScreenGui so it can move freely
 				if Btn.Parent ~= ScreenGui then
