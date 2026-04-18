@@ -88,6 +88,7 @@ task.spawn(function()
     local CoreGui = game:GetService("CoreGui")
     local RunService = game:GetService("RunService")
     local Stats = game:GetService("Stats")
+    local dragLocked = false
 
     -- Falls es schon existiert, löschen (verhindert Duplikate beim Re-Execution)
     if CoreGui:FindFirstChild("YujisStatsOverlay") then
@@ -1802,18 +1803,19 @@ ToggleBtn.MouseButton1Click:Connect(function() Main.Visible = not Main.Visible e
 
 local FLOAT_W = isMobile and (vp.X >= 1024 and s(95) or s(85)) or s(90)
 local FLOAT_H = isMobile and (vp.X >= 1024 and s(85) or s(75)) or s(80)
-local FLOAT_ROWS = 5
 FloatingButtons = Instance.new("Frame", ScreenGui)
 FloatingButtons.Name = "FloatingButtons"
-FloatingButtons.Size = UDim2.new(0, FLOAT_W + s(16), 0, (FLOAT_H + s(8)) * FLOAT_ROWS + s(8))
-FloatingButtons.Position = UDim2.new(1, -(FLOAT_W + s(20)), 0.5, -math.floor(((FLOAT_H + s(8)) * FLOAT_ROWS) / 2))
+FloatingButtons.Size = UDim2.new(0, FLOAT_W * 2 + s(24), 0, (FLOAT_H + s(8)) * 3 + s(8))
+FloatingButtons.Position = UDim2.new(1, -(FLOAT_W * 2 + s(30)), 0.5, -math.floor(((FLOAT_H + s(8)) * 3) / 2))
 FloatingButtons.BackgroundTransparency = 1 FloatingButtons.BorderSizePixel = 0
-FloatingButtons.AutomaticSize = Enum.AutomaticSize.Y
 FloatingButtons.Visible = isMobile
 
-local FloatLayout = Instance.new("UIListLayout", FloatingButtons)
-FloatLayout.Padding = UDim.new(0, s(8)) FloatLayout.SortOrder = Enum.SortOrder.LayoutOrder
-FloatLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+local FloatLayout = Instance.new("UIGridLayout", FloatingButtons)
+FloatLayout.CellSize = UDim2.new(0, FLOAT_W, 0, FLOAT_H)
+FloatLayout.CellPadding = UDim2.new(0, s(8), 0, s(8))
+FloatLayout.SortOrder = Enum.SortOrder.LayoutOrder
+FloatLayout.HorizontalAlignment = Enum.HorizontalAlignment.Left
+
 
 local function createFloatButton(name, topLabel, bottomLabel, order, callback)
 	local Btn = Instance.new("TextButton", FloatingButtons)
